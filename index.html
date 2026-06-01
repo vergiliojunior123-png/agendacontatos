@@ -11,6 +11,12 @@
     <h1>Agenda de Contatos</h1>
     <p class="subtitle">Projeto Web com Firebase Firestore</p>
 
+    <section class="search-area">
+      <input type="text" id="searchInput" placeholder="Buscar contato pelo nome" />
+      <button type="button" id="searchBtn">Buscar</button>
+      <button type="button" id="clearSearchBtn" class="cancel">Limpar</button>
+    </section>
+
     <form id="contactForm">
       <input type="hidden" id="contactId" />
 
@@ -24,7 +30,7 @@
       <input type="email" id="email" placeholder="Digite o e-mail" required />
 
       <label>Observação</label>
-      <textarea id="note" placeholder="Digite uma observação"></textarea>
+      <textarea id="obs" placeholder="Digite uma observação"></textarea>
 
       <button type="submit" id="saveBtn">Salvar contato</button>
       <button type="button" id="cancelBtn" class="cancel">Cancelar edição</button>
