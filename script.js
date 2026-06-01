@@ -29,12 +29,17 @@ const contactId = document.getElementById("contactId");
 const nameInput = document.getElementById("name");
 const phoneInput = document.getElementById("phone");
 const emailInput = document.getElementById("email");
-const noteInput = document.getElementById("note");
+const obsInput = document.getElementById("obs");
 const contactsList = document.getElementById("contactsList");
 const saveBtn = document.getElementById("saveBtn");
 const cancelBtn = document.getElementById("cancelBtn");
+const searchInput = document.getElementById("searchInput");
+const searchBtn = document.getElementById("searchBtn");
+const clearSearchBtn = document.getElementById("clearSearchBtn");
 
 const contactsCollection = collection(db, "contatos");
+
+let allContacts = [];
 
 contactForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -43,8 +48,8 @@ contactForm.addEventListener("submit", async (event) => {
     nome: nameInput.value.trim(),
     telefone: phoneInput.value.trim(),
     email: emailInput.value.trim(),
-    observacao: noteInput.value.trim(),
-    atualizadoEm: serverTimestamp()
+    obs: obsInput.value.trim(),
+    dtContato: serverTimestamp()
   };
 
   try {
@@ -53,7 +58,6 @@ contactForm.addEventListener("submit", async (event) => {
       await updateDoc(contactRef, contact);
       alert("Contato atualizado com sucesso!");
     } else {
-      contact.criadoEm = serverTimestamp();
       await addDoc(contactsCollection, contact);
       alert("Contato cadastrado com sucesso!");
     }
@@ -67,45 +71,66 @@ contactForm.addEventListener("submit", async (event) => {
 
 function loadContacts() {
   onSnapshot(contactsCollection, (snapshot) => {
-    contactsList.innerHTML = "";
-
-    if (snapshot.empty) {
-      contactsList.innerHTML = `<p class="empty">Nenhum contato cadastrado.</p>`;
-      return;
-    }
+    allContacts = [];
 
     snapshot.forEach((docItem) => {
-      const contact = docItem.data();
-
-      const card = document.createElement("div");
-      card.classList.add("contact-card");
-
-      card.innerHTML = `
-        <h3>${contact.nome}</h3>
-        <p><strong>Telefone:</strong> ${contact.telefone}</p>
-        <p><strong>E-mail:</strong> ${contact.email}</p>
-        <p><strong>Observação:</strong> ${contact.observacao || "Sem observação"}</p>
-
-        <div class="actions">
-          <button class="edit">Editar</button>
-          <button class="delete">Excluir</button>
-        </div>
-      `;
-
-      const editBtn = card.querySelector(".edit");
-      const deleteBtn = card.querySelector(".delete");
-
-      editBtn.addEventListener("click", () => {
-        editContact(docItem.id, contact);
+      allContacts.push({
+        id: docItem.id,
+        ...docItem.data()
       });
-
-      deleteBtn.addEventListener("click", () => {
-        removeContact(docItem.id);
-      });
-
-      contactsList.appendChild(card);
     });
+
+    renderContacts(allContacts);
   });
+}
+
+function renderContacts(contacts) {
+  contactsList.innerHTML = "";
+
+  if (contacts.length === 0) {
+    contactsList.innerHTML = `<p class="empty">Nenhum contato cadastrado.</p>`;
+    return;
+  }
+
+  contacts.forEach((contact) => {
+    const card = document.createElement("div");
+    card.classList.add("contact-card");
+
+    card.innerHTML = `
+      <h3>${contact.nome}</h3>
+      <p><strong>Telefone:</strong> ${contact.telefone}</p>
+      <p><strong>E-mail:</strong> ${contact.email}</p>
+      <p><strong>Observação:</strong> ${contact.obs || "Sem observação"}</p>
+
+      <div class="actions">
+        <button class="edit">Editar</button>
+        <button class="delete">Excluir</button>
+      </div>
+    `;
+
+    const editBtn = card.querySelector(".edit");
+    const deleteBtn = card.querySelector(".delete");
+
+    editBtn.addEventListener("click", () => {
+      editContact(contact.id, contact);
+    });
+
+    deleteBtn.addEventListener("click", () => {
+      removeContact(contact.id);
+    });
+
+    contactsList.appendChild(card);
+  });
+}
+
+function searchContacts() {
+  const searchText = searchInput.value.trim().toLowerCase();
+
+  const filteredContacts = allContacts.filter((contact) => {
+    return contact.nome.toLowerCase().includes(searchText);
+  });
+
+  renderContacts(filteredContacts);
 }
 
 function editContact(id, contact) {
@@ -113,7 +138,7 @@ function editContact(id, contact) {
   nameInput.value = contact.nome;
   phoneInput.value = contact.telefone;
   emailInput.value = contact.email;
-  noteInput.value = contact.observacao || "";
+  obsInput.value = contact.obs || "";
 
   saveBtn.textContent = "Atualizar contato";
   cancelBtn.style.display = "block";
@@ -134,13 +159,20 @@ async function removeContact(id) {
   }
 }
 
-cancelBtn.addEventListener("click", clearForm);
-
 function clearForm() {
   contactForm.reset();
   contactId.value = "";
   saveBtn.textContent = "Salvar contato";
   cancelBtn.style.display = "none";
 }
+
+searchBtn.addEventListener("click", searchContacts);
+
+clearSearchBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  renderContacts(allContacts);
+});
+
+cancelBtn.addEventListener("click", clearForm);
 
 loadContacts();
