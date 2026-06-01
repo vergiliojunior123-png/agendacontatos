@@ -68,7 +68,7 @@ contactForm.addEventListener("submit", async (event) => {
 });
 
 function loadContacts() {
-  const contactsQuery = query(contactsCollection, orderBy("nome"));
+  const contactsQuery = contactsCollection;
 
   onSnapshot(contactsQuery, (snapshot) => {
     contactsList.innerHTML = "";
@@ -96,14 +96,11 @@ function loadContacts() {
         </div>
       `;
 
-      const editBtn = card.querySelector(".edit");
-      const deleteBtn = card.querySelector(".delete");
-
-      editBtn.addEventListener("click", () => {
+      card.querySelector(".edit").addEventListener("click", () => {
         editContact(document.id, contact);
       });
 
-      deleteBtn.addEventListener("click", () => {
+      card.querySelector(".delete").addEventListener("click", () => {
         removeContact(document.id);
       });
 
