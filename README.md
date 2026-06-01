@@ -2,8 +2,8 @@
 
 ## Integrantes
 
-- Seu Nome
-- Nome da dupla (se houver)
+- Vergílio Júnior
+- Marcus Vinicius
 
 ## Descrição
 
@@ -35,8 +35,4 @@ Google Firebase Firestore
 
 Foram implementadas regras de segurança no Firestore para validar os dados enviados antes da gravação no banco.
 
-## Como executar
-
-1. Abrir o projeto no VS Code
-2. Instalar a extensão Live Server
-3. Executar o arquivo index.html usando Live Server
+ 
