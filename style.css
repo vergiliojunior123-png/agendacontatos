@@ -125,3 +125,27 @@ h2 {
   color: #777;
   text-align: center;
 }
+
+.search-area {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.search-area input {
+  flex: 1;
+}
+
+.search-area button {
+  width: 120px;
+}
+
+@media (max-width: 600px) {
+  .search-area {
+    flex-direction: column;
+  }
+
+  .search-area button {
+    width: 100%;
+  }
+}
