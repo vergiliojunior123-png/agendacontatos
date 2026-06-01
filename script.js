@@ -8,9 +8,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  serverTimestamp,
-  query,
-  orderBy
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -68,9 +66,7 @@ contactForm.addEventListener("submit", async (event) => {
 });
 
 function loadContacts() {
-  const contactsQuery = contactsCollection;
-
-  onSnapshot(contactsQuery, (snapshot) => {
+  onSnapshot(contactsCollection, (snapshot) => {
     contactsList.innerHTML = "";
 
     if (snapshot.empty) {
@@ -78,8 +74,8 @@ function loadContacts() {
       return;
     }
 
-    snapshot.forEach((document) => {
-      const contact = document.data();
+    snapshot.forEach((docItem) => {
+      const contact = docItem.data();
 
       const card = document.createElement("div");
       card.classList.add("contact-card");
@@ -96,12 +92,15 @@ function loadContacts() {
         </div>
       `;
 
-      card.querySelector(".edit").addEventListener("click", () => {
-        editContact(document.id, contact);
+      const editBtn = card.querySelector(".edit");
+      const deleteBtn = card.querySelector(".delete");
+
+      editBtn.addEventListener("click", () => {
+        editContact(docItem.id, contact);
       });
 
-      card.querySelector(".delete").addEventListener("click", () => {
-        removeContact(document.id);
+      deleteBtn.addEventListener("click", () => {
+        removeContact(docItem.id);
       });
 
       contactsList.appendChild(card);
@@ -114,7 +113,7 @@ function editContact(id, contact) {
   nameInput.value = contact.nome;
   phoneInput.value = contact.telefone;
   emailInput.value = contact.email;
-  noteInput.value = contact.observacao;
+  noteInput.value = contact.observacao || "";
 
   saveBtn.textContent = "Atualizar contato";
   cancelBtn.style.display = "block";
